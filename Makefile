@@ -9,8 +9,15 @@ IMAGE ?= termsonic:pa
 build:
 	docker build -t $(IMAGE) .
 
-## start: Run the container with WSLg PulseAudio and host networking for Tailscale
+## start: Run the container and use the host networking for connecivity.
 start:
+	docker run -it \
+		--network host \
+		-v "$(PWD)/termsonic.toml":/config/termsonic.toml:ro \
+		$(IMAGE)
+
+## start: Run the container and use the host networking and WSLg PulseAudio
+start-wsl:
 	docker run -it \
 		--network host \
 		-e PULSE_SERVER="${PULSE_SERVER}" \

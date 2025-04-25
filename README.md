@@ -1,13 +1,7 @@
 ```markdown
 # Termsonic Docker
 
-A minimal Docker setup for running [Termsonic](https://git.sixfoisneuf.fr/termsonic). on a tailscale server using docker over wsl2
-
-## Requirements
-
-- Docker  
-- WSLg (for audio)  
-- Tailscale (host networking)  
+A minimal Docker setup for running [Termsonic](https://git.sixfoisneuf.fr/termsonic). 
 
 ## Usage
 
@@ -20,6 +14,12 @@ A minimal Docker setup for running [Termsonic](https://git.sixfoisneuf.fr/termso
    ```bash
    make start
    ```
+
+    If you are using wsl you can run:
+    ```bash
+    make start-wsl
+    ```
+
 
 Configuration is loaded from `termsonic.toml` in the project root (mounted into `/config/termsonic.toml`).  
 ```
