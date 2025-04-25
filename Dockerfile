@@ -1,40 +1,42 @@
 # syntax=docker/dockerfile:1.4
 
-# --- Build stage -------------------------------------------------------
-FROM golang:1.20-alpine AS builder
+# ─── Build Stage ────────────────────────────────────────────────────────
+FROM golang:1.20 AS builder
 
-# Pull in git, the C toolchain, pkgconfig, and PulseAudio dev headers
-RUN apk add --no-cache \
-    git \
-    ca-certificates \
-    build-base \
-    pkgconfig \
-    pulseaudio-dev
+# Install git, C toolchain, pkg-config, PulseAudio *and* ALSA dev headers
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+      git \
+      build-essential \
+      pkg-config \
+      libasound2-dev \
+      libpulse-dev \
+      ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
 
 WORKDIR /src
-RUN --mount=type=cache,target=/root/.cache/go-build \
-    git clone --branch main https://git.sixfoisneuf.fr/termsonic . && \
-    go mod download
+RUN git clone --branch main https://git.sixfoisneuf.fr/termsonic . \
+ && go mod download
 
-# Enable cgo so Oto’s PulseAudio driver is compiled in
 RUN CGO_ENABLED=1 go build -o termsonic ./cmd/termsonic
 
+# ─── Runtime Stage ──────────────────────────────────────────────────────
+FROM ubuntu:22.04
 
-# --- Final image -------------------------------------------------------
-FROM alpine:3.19
+# Pull in both ALSA & PulseAudio clients + certs
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+      libasound2 \
+      libpulse0 \
+      pulseaudio \
+      pulseaudio-utils \
+      ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
 
-# Only the PulseAudio client and certs (no ALSA)
-RUN apk add --no-cache \
-    ca-certificates \
-    pulseaudio-utils \
-    pulseaudio
-
-# Copy certs and binary
-COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+# copy your built binary
 COPY --from=builder /src/termsonic /usr/local/bin/termsonic
 
-# Mount your config at /config/termsonic.toml
+# point Termsonic at /config/termsonic.toml
 ENV XDG_CONFIG_DIR=/config
 
 ENTRYPOINT ["/usr/local/bin/termsonic"]
-
