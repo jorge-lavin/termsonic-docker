@@ -29,7 +29,6 @@ RUN apt-get update && \
       libasound2 \
       libpulse0 \
       pulseaudio \
-      pulseaudio-utils \
       ca-certificates && \
     rm -rf /var/lib/apt/lists/*
 
