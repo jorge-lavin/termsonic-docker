@@ -1,4 +1,3 @@
-```markdown
 # Termsonic Docker
 
 A minimal Docker setup for running [Termsonic](https://git.sixfoisneuf.fr/termsonic). on a tailscale server using docker over wsl2
@@ -22,5 +21,3 @@ A minimal Docker setup for running [Termsonic](https://git.sixfoisneuf.fr/termso
    ```
 
 Configuration is loaded from `termsonic.toml` in the project root (mounted into `/config/termsonic.toml`).  
-```
-
