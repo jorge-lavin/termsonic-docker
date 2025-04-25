@@ -2,7 +2,7 @@
 
 # ─── Build Stage ────────────────────────────────────────────────────────
 FROM golang:1.20 AS builder
-
+ARG REPO_REF=main
 # Install git, C toolchain, pkg-config, PulseAudio *and* ALSA dev headers
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
@@ -15,7 +15,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /src
-RUN git clone --branch main https://git.sixfoisneuf.fr/termsonic . \
+RUN git clone --branch ${REPO_REF} https://git.sixfoisneuf.fr/termsonic . \
  && go mod download
 
 RUN CGO_ENABLED=1 go build -o termsonic ./cmd/termsonic
